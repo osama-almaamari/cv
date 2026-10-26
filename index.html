@@ -56,7 +56,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   background: var(--bg); color: var(--ink);
@@ -106,10 +106,8 @@ a { color: var(--accent); }
 .bar-id b { display: block; font-family: var(--display); font-stretch: 80%; font-weight: 700; font-size: 18px; line-height: 1.15; }
 .bar-id small { display: block; color: var(--night-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar-id > div { min-width: 0; }
-.bar nav { display: flex; gap: 22px; }
-.bar nav a { color: var(--night-muted); text-decoration: none; font: 500 13px/1 var(--mono); letter-spacing: .5px; }
-.bar nav a:hover { color: var(--night-ink); }
-@media (max-width: 860px) { .bar nav { display: none; } }
+.bar .nav a { padding: 8px 13px; font-size: 12.5px; }
+@media (max-width: 860px) { .bar .nav { display: none; } }
 
 /* ---------- hero ---------- */
 .hero { position: relative; background: var(--night); color: var(--night-ink); overflow: hidden; isolation: isolate; }
@@ -128,15 +126,34 @@ a { color: var(--accent); }
   display: grid; place-items: center; font: 600 13px/1 var(--mono); color: var(--cyan);
 }
 .mark span:last-child { font: 500 12.5px/1 var(--mono); color: var(--night-muted); letter-spacing: .5px; }
-.top nav { display: flex; gap: 26px; }
-.top nav a { color: var(--night-muted); text-decoration: none; font: 500 13px/1 var(--mono); letter-spacing: .5px; }
-.top nav a:hover { color: var(--night-ink); }
-@media (max-width: 760px) { .top nav { display: none; } }
+/* navigation pills (hero + sticky bar) */
+.nav { display: flex; gap: 8px; }
+.nav a {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  padding: 9px 16px; border-radius: 999px;
+  border: 1px solid var(--night-line); background: rgba(255,255,255,.03);
+  color: var(--night-ink); text-decoration: none;
+  font: 500 13px/1 var(--mono); letter-spacing: .4px;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.nav a:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(79,195,240,.08); }
+.nav a.is-active { background: var(--cyan); border-color: var(--cyan); color: #04202e; }
+@media (max-width: 760px) {
+  .top { flex-wrap: wrap; row-gap: 14px; }
+  .top .nav {
+    width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    margin-right: calc(-1 * max(20px, env(safe-area-inset-right, 0px))); padding-right: 20px;
+  }
+  .top .nav::-webkit-scrollbar { display: none; }
+  .top .nav { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .nav a { padding: 10px 15px; }
+}
 
 .hero-grid {
   display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, .8fr);
   gap: 56px; align-items: center; padding-block: 40px 56px;
 }
+.hero-grid > div { min-width: 0; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
   font: 500 13px/1.4 var(--mono); color: var(--cyan); letter-spacing: .6px; text-transform: uppercase;
@@ -144,10 +161,10 @@ a { color: var(--accent); }
 .eyebrow::before { content: ""; width: 26px; height: 1.5px; background: var(--cyan); }
 h1 {
   font-family: var(--display); font-weight: 800; font-stretch: 68%;
-  font-size: clamp(46px, 13vw, 108px); line-height: .88; letter-spacing: -1px;
+  font-size: clamp(34px, 11.5vw, 96px); line-height: .95; letter-spacing: -1px; white-space: nowrap;
   margin: 18px 0 22px; text-transform: uppercase;
 }
-h1 .ln2 { display: block; color: transparent; -webkit-text-stroke: 1.5px var(--night-ink); }
+h1 .ln2 { color: transparent; -webkit-text-stroke: 1.5px var(--night-ink); }
 @supports not (-webkit-text-stroke: 1px #000) { h1 .ln2 { color: var(--night-ink); } }
 .role {
   font-family: var(--display); font-stretch: 88%; font-weight: 600;
@@ -206,7 +223,7 @@ h1 .ln2 { display: block; color: transparent; -webkit-text-stroke: 1.5px var(--n
 .stat span { display: block; color: var(--night-muted); font-size: 14.5px; margin-top: 8px; line-height: 1.35; }
 
 @media (max-width: 860px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 36px; padding-top: 18px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-top: 18px; }
   .portrait { justify-self: start; width: min(62%, 220px); order: -1; }
   .tagcard { position: static; margin-top: 4px; width: max-content; max-width: 100%; }
   .portrait { width: auto; }
@@ -373,7 +390,7 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 <div class="bar" id="bar" aria-hidden="true">
   <div class="in">
     <div class="bar-id"><img class="js-photo" src="photo.jpg" alt=""><div><b>Osama Almamari</b><small>Senior IT Infrastructure &amp; Systems Administrator</small></div></div>
-    <nav aria-label="Sections"><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
+    <nav class="nav" aria-label="Sections"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
     <a class="btn btn-primary btn-sm js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener" tabindex="-1"><svg aria-hidden="true"><use href="#i-dl"/></svg>PDF</a>
   </div>
 </div>
@@ -383,13 +400,13 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
   <div class="in">
     <div class="top">
       <a class="mark" href="#hero" aria-label="Osama Almamari"><span>OA</span><span>21.54°N 39.17°E · JEDDAH</span></a>
-      <nav aria-label="Sections"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
+      <nav class="nav" aria-label="Sections"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
     </div>
 
     <div class="hero-grid">
       <div>
         <span class="eyebrow">IT Infrastructure · Systems · Networks</span>
-        <h1>Osama<span class="ln2">Almamari</span></h1>
+        <h1 id="name">Osama <span class="ln2">Almamari</span></h1>
         <p class="role">Senior IT Infrastructure &amp; Systems Administrator</p>
         <p class="lead"><b>10+ years</b> keeping enterprise servers, networks and Microsoft&nbsp;365 running for multi-branch organizations in Saudi Arabia and Yemen, from virtualization and security to backup, telephony and ERP.</p>
         <div class="actions">
@@ -535,7 +552,7 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
       <article class="proj">
         <div class="yr">2022</div>
         <h3>IT Infrastructure Deployment &amp; Digital Transformation</h3>
-        <p class="org">TYF</p>
+        <p class="org">Tamdeen Youth Foundation</p>
         <ul>
           <li>Installed and configured a complete network infrastructure for a newly established building.</li>
           <li>Implemented an open-source ERP system for enterprise resource planning and centralized data management.</li>
@@ -620,8 +637,8 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
       <div class="cred">
         <h3>Awards &amp; recognition</h3>
         <dl>
-          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt>Employee of the Year</dt><dd>TYF · 2023</dd></div></div>
-          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt>Training Certificate, Microsoft 365</dt><dd>TYF · 2023</dd></div></div>
+          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt>Employee of the Year</dt><dd>Tamdeen Youth Foundation · 2023</dd></div></div>
+          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt>Training Certificate, Microsoft 365</dt><dd>Tamdeen Youth Foundation · 2023</dd></div></div>
         </dl>
       </div>
     </div>
@@ -716,6 +733,35 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
       bar.setAttribute("aria-hidden", off ? "false" : "true");
       bar.querySelector(".js-dl").tabIndex = off ? 0 : -1;
     }, { rootMargin: "-120px 0px 0px 0px" }).observe(hero);
+  }
+
+  /* Keep the full name on one line: shrink only if it would overflow its column */
+  var nameEl = document.getElementById("name");
+  function fitName() {
+    nameEl.style.fontSize = "";
+    var box = nameEl.parentNode.clientWidth, w = nameEl.scrollWidth, fs = parseFloat(getComputedStyle(nameEl).fontSize);
+    if (w > box) nameEl.style.fontSize = Math.floor(fs * box / w * 0.98) + "px";
+  }
+  fitName();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
+  window.addEventListener("resize", fitName);
+
+  /* Highlight the nav pill for the section on screen */
+  var navLinks = document.querySelectorAll(".nav a");
+  if ("IntersectionObserver" in window) {
+    var spy = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        navLinks.forEach(function (a) {
+          var on = a.getAttribute("href") === "#" + e.target.id;
+          a.classList.toggle("is-active", on);
+          if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+        });
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    ["about", "experience", "projects", "skills", "credentials", "contact"].forEach(function (id) {
+      var el = document.getElementById(id); if (el) spy.observe(el);
+    });
   }
 
   var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
