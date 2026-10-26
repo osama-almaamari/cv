@@ -15,10 +15,11 @@
 <meta property="og:type" content="profile">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,400..900&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700;800&display=swap">
 <style>
 /* Layout: a deep "network operations" hero band with a live topology drawing behind the portrait,
-   a light reading body (timeline rail, project grid, a server-rack skills cabinet), and a dark closing band. */
+   a light reading body (timeline rail, project grid, a server-rack skills cabinet), and a dark closing band.
+   Bilingual: English (LTR) and Arabic (RTL); logical properties keep one stylesheet for both directions. */
 :root {
   --bg: #f1f4f6;
   --surface: #ffffff;
@@ -38,9 +39,9 @@
   --night-muted: #8ea3b5;
   --cyan: #4fc3f0;
 
-  --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  --body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display: "Archivo", "Noto Kufi Arabic", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Sans 3", "IBM Plex Sans Arabic", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", "IBM Plex Sans Arabic", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -54,6 +55,15 @@
   --accent: #5cbde6; --accent-soft: #14303f; --signal: #3ccb90;
   color-scheme: dark;
 }
+/* Arabic: Arabic faces first, no letter-spacing (it breaks joined letters) */
+:root[lang="ar"] {
+  --display: "Noto Kufi Arabic", "Archivo", Tahoma, sans-serif;
+  --body: "IBM Plex Sans Arabic", "Source Sans 3", Tahoma, "Segoe UI", sans-serif;
+}
+:root[lang="ar"] body * { letter-spacing: 0 !important; }
+
+/* language switching */
+:root[lang="ar"] .t-en, :root:not([lang="ar"]) .t-ar { display: none !important; }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 76px; }
@@ -63,16 +73,17 @@ body {
   font-family: var(--body); font-size: 17px; line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
+:root[lang="ar"] body { line-height: 1.8; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--night); }
 a { color: var(--accent); }
 :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 6px; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
 
 .in {
   max-width: 1120px; margin: 0 auto;
   padding-left: max(20px, env(safe-area-inset-left, 0px));
   padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
-.mono { font-family: var(--mono); }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -82,13 +93,29 @@ a { color: var(--accent); }
   border: 1px solid var(--night-line); background: transparent; color: var(--night-ink);
   transition: background .15s, border-color .15s, transform .15s, color .15s;
 }
+:root[lang="ar"] .btn { line-height: 1.2; padding-block: 12px; }
 .btn svg { width: 18px; height: 18px; flex: none; }
 .btn:hover { border-color: var(--cyan); color: #fff; }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--cyan); border-color: var(--cyan); color: #04202e; }
 .btn-primary:hover { background: #7ad4f5; border-color: #7ad4f5; color: #04202e; }
 .btn-sm { padding: 10px 14px; font-size: 14px; border-radius: 8px; }
+:root[lang="ar"] .btn-sm { padding-block: 8px; }
 .btn[aria-busy="true"] { opacity: .7; pointer-events: none; }
+
+/* language toggle */
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  padding: 8px 14px 8px 11px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--cyan); background: rgba(79,195,240,.10); color: var(--night-ink);
+  font: 600 14px/1.2 var(--body);
+  transition: background .15s, color .15s;
+}
+.lang-btn svg { width: 17px; height: 17px; color: var(--cyan); flex: none; }
+.lang-btn:hover { background: var(--cyan); color: #04202e; }
+.lang-btn:hover svg { color: #04202e; }
+.lang-btn .t-en { font-family: "IBM Plex Sans Arabic", var(--body); }
+.lang-btn .t-ar { font-family: "Source Sans 3", var(--body); }
 
 /* ---------- sticky bar ---------- */
 .bar {
@@ -103,11 +130,13 @@ a { color: var(--accent); }
 .bar .in { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-block: 10px; }
 .bar-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .bar-id img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex: none; }
-.bar-id b { display: block; font-family: var(--display); font-stretch: 80%; font-weight: 700; font-size: 18px; line-height: 1.15; }
+.bar-id b { display: block; font-family: var(--display); font-stretch: 80%; font-weight: 700; font-size: 18px; line-height: 1.25; }
 .bar-id small { display: block; color: var(--night-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar-id > div { min-width: 0; }
+.bar-end { display: flex; align-items: center; gap: 8px; flex: none; }
 .bar .nav a { padding: 8px 13px; font-size: 12.5px; }
-@media (max-width: 860px) { .bar .nav { display: none; } }
+.bar .lang-btn { padding: 7px 12px 7px 9px; font-size: 13px; }
+@media (max-width: 960px) { .bar .nav { display: none; } }
 
 /* ---------- hero ---------- */
 .hero { position: relative; background: var(--night); color: var(--night-ink); overflow: hidden; isolation: isolate; }
@@ -117,15 +146,21 @@ a { color: var(--accent); }
     radial-gradient(900px 500px at 78% 30%, rgba(79,195,240,.13), transparent 60%),
     linear-gradient(180deg, transparent 70%, rgba(0,0,0,.25));
 }
+:root[dir="rtl"] .hero::after {
+  background:
+    radial-gradient(900px 500px at 22% 30%, rgba(79,195,240,.13), transparent 60%),
+    linear-gradient(180deg, transparent 70%, rgba(0,0,0,.25));
+}
 #topo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; display: block; }
 
-.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px; }
-.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--night-ink); }
-.mark span:first-child {
-  width: 34px; height: 34px; border: 1.5px solid var(--cyan); border-radius: 8px;
-  display: grid; place-items: center; font: 600 13px/1 var(--mono); color: var(--cyan);
+.top { display: flex; align-items: center; gap: 14px; padding-block: 22px; }
+.mark { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--night-ink); margin-inline-end: auto; min-width: 0; }
+.mark > span:first-child {
+  width: 34px; height: 34px; border: 1.5px solid var(--cyan); border-radius: 8px; flex: none;
+  display: grid; place-items: center; font: 600 13px/1 "JetBrains Mono", ui-monospace, monospace; color: var(--cyan);
 }
-.mark span:last-child { font: 500 12.5px/1 var(--mono); color: var(--night-muted); letter-spacing: .5px; }
+.mark > span:last-child { font: 500 12.5px/1.3 var(--mono); color: var(--night-muted); letter-spacing: .5px; white-space: nowrap; }
+
 /* navigation pills (hero + sticky bar) */
 .nav { display: flex; gap: 8px; }
 .nav a {
@@ -133,19 +168,21 @@ a { color: var(--accent); }
   padding: 9px 16px; border-radius: 999px;
   border: 1px solid var(--night-line); background: rgba(255,255,255,.03);
   color: var(--night-ink); text-decoration: none;
-  font: 500 13px/1 var(--mono); letter-spacing: .4px;
+  font: 500 13px/1.2 var(--mono); letter-spacing: .4px;
   transition: background .15s, border-color .15s, color .15s;
 }
+:root[lang="ar"] .nav a { font-size: 14px; padding-block: 7px; }
 .nav a:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(79,195,240,.08); }
 .nav a.is-active { background: var(--cyan); border-color: var(--cyan); color: #04202e; }
 @media (max-width: 760px) {
   .top { flex-wrap: wrap; row-gap: 14px; }
+  .mark > span:last-child { font-size: 11.5px; }
   .top .nav {
-    width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    margin-right: calc(-1 * max(20px, env(safe-area-inset-right, 0px))); padding-right: 20px;
+    order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent);
   }
+  :root[dir="rtl"] .top .nav { -webkit-mask-image: linear-gradient(270deg, #000 85%, transparent); mask-image: linear-gradient(270deg, #000 85%, transparent); }
   .top .nav::-webkit-scrollbar { display: none; }
-  .top .nav { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
   .nav a { padding: 10px 15px; }
 }
 
@@ -156,33 +193,39 @@ a { color: var(--accent); }
 .hero-grid > div { min-width: 0; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
-  font: 500 13px/1.4 var(--mono); color: var(--cyan); letter-spacing: .6px; text-transform: uppercase;
+  font: 500 13px/1.5 var(--mono); color: var(--cyan); letter-spacing: .6px; text-transform: uppercase;
 }
-.eyebrow::before { content: ""; width: 26px; height: 1.5px; background: var(--cyan); }
+:root[lang="ar"] .eyebrow { font-size: 14px; }
+.eyebrow::before { content: ""; width: 26px; height: 1.5px; background: var(--cyan); flex: none; }
 h1 {
   font-family: var(--display); font-weight: 800; font-stretch: 68%;
   font-size: clamp(34px, 11.5vw, 96px); line-height: .95; letter-spacing: -1px; white-space: nowrap;
   margin: 18px 0 22px; text-transform: uppercase;
 }
+:root[lang="ar"] h1 { line-height: 1.45; margin: 10px 0 12px; }
 h1 .ln2 { color: transparent; -webkit-text-stroke: 1.5px var(--night-ink); }
 @supports not (-webkit-text-stroke: 1px #000) { h1 .ln2 { color: var(--night-ink); } }
 .role {
   font-family: var(--display); font-stretch: 88%; font-weight: 600;
-  font-size: clamp(20px, 2.6vw, 26px); line-height: 1.25; margin: 0 0 12px; text-wrap: balance;
+  font-size: clamp(20px, 2.6vw, 26px); line-height: 1.35; margin: 0 0 12px; text-wrap: balance;
 }
+:root[lang="ar"] .role { font-weight: 700; font-size: clamp(19px, 2.3vw, 24px); line-height: 1.6; }
 .lead { color: var(--night-muted); font-size: 18px; max-width: 54ch; margin: 0; }
 .lead b { color: var(--night-ink); font-weight: 600; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
 
 .contacts { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 26px; }
 .contact { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.contact .k { font: 500 11px/1 var(--mono); text-transform: uppercase; letter-spacing: 1.2px; color: var(--night-muted); }
-.contact .v { font: 500 14.5px/1.3 var(--mono); user-select: all; overflow-wrap: anywhere; }
+.contact .k { font: 500 11px/1.3 var(--mono); text-transform: uppercase; letter-spacing: 1.2px; color: var(--night-muted); }
+:root[lang="ar"] .contact .k { font-size: 13px; }
+.contact .v { font: 500 14.5px/1.3 "JetBrains Mono", ui-monospace, monospace; user-select: all; overflow-wrap: anywhere; direction: ltr; unicode-bidi: isolate; }
 .copy {
-  font: 500 11.5px/1 var(--mono); color: var(--night-muted); background: transparent;
+  font: 500 11.5px/1.2 var(--mono); color: var(--night-muted); background: transparent;
   border: 1px solid var(--night-line); border-radius: 6px; padding: 6px 8px; cursor: pointer;
 }
+:root[lang="ar"] .copy { font-size: 12.5px; padding-block: 4px; }
 .copy:hover { color: var(--cyan); border-color: var(--cyan); }
+.copy:not(.done) .c2, .copy.done .c1 { display: none; }
 
 /* portrait in a bracketed frame */
 .portrait { position: relative; justify-self: end; width: min(100%, 380px); }
@@ -198,41 +241,41 @@ h1 .ln2 { color: transparent; -webkit-text-stroke: 1.5px var(--night-ink); }
   filter: saturate(.92) contrast(1.02);
 }
 .tagcard {
-  position: absolute; left: -28px; bottom: 34px;
+  position: absolute; inset-inline-start: -28px; bottom: 34px;
   background: rgba(10,22,34,.92); border: 1px solid var(--night-line); border-radius: 10px;
   padding: 11px 14px; display: flex; gap: 10px; align-items: center;
   backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); max-width: calc(100% + 28px);
 }
-.tagcard small { display: block; font: 500 10.5px/1.2 var(--mono); color: var(--night-muted); text-transform: uppercase; letter-spacing: 1px; }
-.tagcard b { display: block; font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+.tagcard small { display: block; font: 500 10.5px/1.3 var(--mono); color: var(--night-muted); text-transform: uppercase; letter-spacing: 1px; }
+:root[lang="ar"] .tagcard small { font-size: 12px; }
+.tagcard b { display: block; font-weight: 600; font-size: 14.5px; line-height: 1.4; }
 .led { width: 9px; height: 9px; border-radius: 50%; background: var(--signal); flex: none; box-shadow: 0 0 0 0 rgba(25,160,108,.6); animation: ping 2.2s infinite; }
 @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(60,203,144,.55); } 70% { box-shadow: 0 0 0 9px rgba(60,203,144,0); } 100% { box-shadow: 0 0 0 0 rgba(60,203,144,0); } }
 @media (prefers-reduced-motion: reduce) { .led { animation: none; } }
 
-.coord { position: absolute; right: 2px; top: -24px; font: 500 11px/1 var(--mono); color: var(--night-muted); letter-spacing: .5px; }
+.coord { position: absolute; inset-inline-end: 2px; top: -24px; font: 500 11px/1 "JetBrains Mono", ui-monospace, monospace; color: var(--night-muted); letter-spacing: .5px; direction: ltr; }
 
 /* stats strip */
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--night-line); }
-.stat { padding: 24px 20px 28px 0; }
-.stat + .stat { padding-left: 22px; border-left: 1px solid var(--night-line); }
+.stat { padding-block: 24px 28px; padding-inline: 0 20px; }
+.stat + .stat { padding-inline-start: 22px; border-inline-start: 1px solid var(--night-line); }
 .stat b {
-  display: block; font-family: var(--display); font-stretch: 70%; font-weight: 800;
+  display: block; font-family: "Archivo", var(--display); font-stretch: 70%; font-weight: 800;
   font-size: clamp(38px, 5vw, 54px); line-height: 1; font-variant-numeric: tabular-nums;
 }
-.stat b sup { font-size: .5em; color: var(--cyan); vertical-align: top; position: relative; top: .15em; margin-left: 2px; }
-.stat span { display: block; color: var(--night-muted); font-size: 14.5px; margin-top: 8px; line-height: 1.35; }
+.stat b sup { font-size: .5em; color: var(--cyan); vertical-align: top; position: relative; top: .15em; margin-inline-start: 2px; }
+.stat span { display: block; color: var(--night-muted); font-size: 14.5px; margin-top: 8px; line-height: 1.45; }
 
 @media (max-width: 860px) {
   .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-top: 18px; }
-  .portrait { justify-self: start; width: min(62%, 220px); order: -1; }
+  .portrait { justify-self: start; width: auto; order: -1; }
   .tagcard { position: static; margin-top: 4px; width: max-content; max-width: 100%; }
-  .portrait { width: auto; }
   .frame { width: min(62vw, 220px); }
   .coord { display: none; }
 }
 @media (max-width: 640px) {
   .stats { grid-template-columns: 1fr 1fr; }
-  .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+  .stat:nth-child(3) { padding-inline-start: 0; border-inline-start: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--night-line); }
   h1 .ln2 { -webkit-text-stroke-width: 1.2px; }
 }
@@ -240,58 +283,66 @@ h1 .ln2 { color: transparent; -webkit-text-stroke: 1.5px var(--night-ink); }
 /* ---------- sections ---------- */
 section { padding-block: 88px 0; }
 .sec-head { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; margin-bottom: 40px; align-items: end; }
-.sec-no { font: 500 13px/1 var(--mono); color: var(--accent); letter-spacing: 1px; text-transform: uppercase; display: flex; gap: 10px; align-items: center; padding-bottom: 10px; }
+.sec-no { font: 500 13px/1.3 var(--mono); color: var(--accent); letter-spacing: 1px; text-transform: uppercase; display: flex; gap: 10px; align-items: center; padding-bottom: 10px; }
+:root[lang="ar"] .sec-no { font-size: 14.5px; font-weight: 600; }
 .sec-no::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-transform: uppercase; font-size: clamp(38px, 6vw, 64px); line-height: .92; margin: 0; letter-spacing: -.5px; text-wrap: balance; }
+:root[lang="ar"] h2 { font-size: clamp(30px, 4.6vw, 50px); line-height: 1.45; }
 @media (max-width: 760px) { .sec-head { grid-template-columns: 1fr; gap: 14px; margin-bottom: 30px; } .sec-no { padding-bottom: 0; } section { padding-top: 68px; } }
 
 /* about */
 .about { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; }
 .about p { font-size: clamp(19px, 2.1vw, 23px); line-height: 1.55; margin: 0; max-width: 62ch; text-wrap: pretty; }
+:root[lang="ar"] .about p { line-height: 1.9; font-size: clamp(18px, 2vw, 21px); }
 .about p em { font-style: normal; color: var(--accent); font-weight: 600; }
-.about aside { font: 500 13px/1.8 var(--mono); color: var(--muted); }
-.about aside b { color: var(--ink); font-weight: 600; display: block; }
-@media (max-width: 760px) { .about { grid-template-columns: 1fr; gap: 18px; } .about aside { order: 2; } }
+@media (max-width: 760px) { .about { grid-template-columns: 1fr; gap: 18px; } }
 
 /* timeline */
 .rail { position: relative; display: grid; gap: 0; }
 .job { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; position: relative; padding-bottom: 54px; }
 .job:last-child { padding-bottom: 0; }
-.job::before { content: ""; position: absolute; left: 227px; top: 10px; bottom: -10px; width: 1.5px; background: var(--line); }
+.job::before { content: ""; position: absolute; inset-inline-start: 227px; top: 10px; bottom: -10px; width: 1.5px; background: var(--line); }
 .job:last-child::before { display: none; }
-.node { position: absolute; left: 220px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.node { position: absolute; inset-inline-start: 220px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+:root[lang="ar"] .node { top: 7px; }
 .job.now .node { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 0 5px color-mix(in srgb, var(--signal) 22%, transparent); }
-.when { font: 500 13.5px/1.55 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; padding-right: 26px; }
+.when { font: 500 13.5px/1.55 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-align: end; padding-inline-end: 26px; }
+:root[lang="ar"] .when { font-size: 14.5px; }
 .when .loc { display: block; color: var(--ink); opacity: .8; margin-top: 4px; font-size: 12.5px; }
+:root[lang="ar"] .when .loc { font-size: 13.5px; }
 .when .now-lbl { display: inline-block; color: var(--signal); font-weight: 600; }
-.job-body { padding-left: 22px; min-width: 0; }
-.job h3 { font-family: var(--display); font-stretch: 82%; font-weight: 700; font-size: clamp(23px, 2.6vw, 28px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.job-body { padding-inline-start: 22px; min-width: 0; }
+.job h3 { font-family: var(--display); font-stretch: 82%; font-weight: 700; font-size: clamp(23px, 2.6vw, 28px); line-height: 1.25; margin: 0; text-wrap: balance; }
+:root[lang="ar"] .job h3 { font-size: clamp(20px, 2.3vw, 24px); line-height: 1.6; }
 .org { color: var(--accent); font-weight: 600; margin: 4px 0 14px; }
-.job ul, .proj ul { margin: 0; padding-left: 18px; display: grid; gap: 7px; }
+.job ul, .proj ul { margin: 0; padding-inline-start: 18px; display: grid; gap: 7px; }
 .job li { max-width: 72ch; }
 .job li::marker, .proj li::marker { color: var(--accent); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
-.chip { font: 500 12px/1 var(--mono); padding: 7px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); }
+.chip { font: 500 12px/1 "JetBrains Mono", ui-monospace, monospace; padding: 7px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); }
 @media (max-width: 760px) {
-  .job { grid-template-columns: 1fr; gap: 6px; padding-left: 28px; padding-bottom: 44px; }
-  .job::before { left: 7px; top: 12px; }
-  .node { left: 0; }
-  .when { text-align: left; padding-right: 0; }
-  .when .loc { display: inline; margin-left: 8px; }
-  .job-body { padding-left: 0; }
+  .job { grid-template-columns: 1fr; gap: 6px; padding-inline-start: 28px; padding-bottom: 44px; }
+  .job::before { inset-inline-start: 7px; top: 12px; }
+  .node { inset-inline-start: 0; }
+  .when { text-align: start; padding-inline-end: 0; }
+  .when .loc { display: inline; margin-inline-start: 8px; }
+  .job-body { padding-inline-start: 0; }
 }
 
 /* projects */
 .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .proj { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 30px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .proj.feature { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 36px; padding: 38px; }
-.yr { font-family: var(--display); font-stretch: 65%; font-weight: 800; font-size: 64px; line-height: .9; color: var(--accent); font-variant-numeric: tabular-nums; }
+.yr { font-family: "Archivo", var(--display); font-stretch: 65%; font-weight: 800; font-size: 64px; line-height: .9; color: var(--accent); font-variant-numeric: tabular-nums; }
 .proj.feature .yr { font-size: 96px; }
-.proj h3 { font-family: var(--display); font-stretch: 82%; font-weight: 700; font-size: 23px; line-height: 1.2; margin: 14px 0 2px; text-wrap: balance; }
+.proj h3 { font-family: var(--display); font-stretch: 82%; font-weight: 700; font-size: 23px; line-height: 1.3; margin: 14px 0 2px; text-wrap: balance; }
 .proj.feature h3 { font-size: 30px; }
+:root[lang="ar"] .proj h3 { font-size: 20px; line-height: 1.7; }
+:root[lang="ar"] .proj.feature h3 { font-size: 25px; }
 .proj .org { margin-bottom: 14px; }
 .sites { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
-.site { font: 500 12px/1 var(--mono); border: 1px dashed var(--accent); color: var(--accent); padding: 7px 10px; border-radius: 6px; }
+.site { font: 500 12px/1.3 var(--mono); border: 1px dashed var(--accent); color: var(--accent); padding: 6px 10px; border-radius: 6px; }
+:root[lang="ar"] .site { font-size: 13px; }
 @media (max-width: 860px) {
   .projects { grid-template-columns: 1fr; }
   .proj.feature { grid-template-columns: 1fr; gap: 10px; padding: 28px; }
@@ -305,7 +356,8 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
   border: 1px solid var(--night-line);
   box-shadow: inset 0 0 0 6px var(--night-2);
 }
-.rack-top { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 16px; font: 500 11.5px/1 var(--mono); color: var(--night-muted); letter-spacing: 1px; text-transform: uppercase; }
+.rack-top { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 16px; font: 500 11.5px/1.3 var(--mono); color: var(--night-muted); letter-spacing: 1px; text-transform: uppercase; }
+:root[lang="ar"] .rack-top { font-size: 13px; }
 .rack-top .leds { display: flex; gap: 6px; }
 .rack-top .leds i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); display: block; }
 .rack-top .leds i:nth-child(2) { background: var(--amber); }
@@ -317,10 +369,12 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 }
 .ear { display: grid; gap: 14px; justify-items: center; }
 .ear i { width: 8px; height: 8px; border-radius: 50%; background: #0a1622; box-shadow: inset 0 0 0 1.5px #2b4459; display: block; }
-.unit h4 { margin: 0; font: 600 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: 1px; color: var(--cyan); }
+.unit h4 { margin: 0; font: 600 12.5px/1.4 var(--mono); text-transform: uppercase; letter-spacing: 1px; color: var(--cyan); }
+:root[lang="ar"] .unit h4 { font-size: 14.5px; }
 .unit h4 small { display: block; color: var(--night-muted); font-weight: 400; letter-spacing: .5px; margin-top: 3px; }
+:root[lang="ar"] .unit h4 small { font-size: 12.5px; }
 .ports { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
-.port { font-size: 14.5px; line-height: 1.2; padding: 7px 11px; border-radius: 6px; background: #0a1622; border: 1px solid #23394d; color: var(--night-ink); }
+.port { font-size: 14.5px; line-height: 1.3; padding: 7px 11px; border-radius: 6px; background: #0a1622; border: 1px solid #23394d; color: var(--night-ink); }
 .port.hl { border-color: rgba(79,195,240,.55); }
 @media (max-width: 760px) {
   .rack { padding: 12px; }
@@ -329,7 +383,8 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 }
 
 .comp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; margin-top: 48px; }
-.comp h3 { font: 600 12.5px/1 var(--mono); text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent); margin: 0 0 14px; }
+.comp h3 { font: 600 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent); margin: 0 0 14px; }
+:root[lang="ar"] .comp h3, :root[lang="ar"] .cred h3 { font-size: 15px; }
 .comp ul { list-style: none; margin: 0; padding: 0; }
 .comp li { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; }
 .comp li::before { content: ""; width: 6px; height: 6px; background: var(--accent); flex: none; transform: translateY(-2px); }
@@ -340,28 +395,32 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 /* credentials */
 .creds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .cred { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px; min-width: 0; }
-.cred h3 { font: 600 12.5px/1 var(--mono); text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent); margin: 0 0 18px; }
+.cred h3 { font: 600 12.5px/1.3 var(--mono); text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent); margin: 0 0 18px; }
 .cred dl { margin: 0; display: grid; gap: 14px; }
-.cred dt { font-weight: 600; line-height: 1.35; }
-.cred dd { margin: 3px 0 0; color: var(--muted); font: 400 13px/1.4 var(--mono); }
+.cred dt { font-weight: 600; line-height: 1.45; }
+.cred dd { margin: 3px 0 0; color: var(--muted); font: 400 13px/1.5 var(--mono); }
+:root[lang="ar"] .cred dd { font-size: 14px; }
 .award { display: flex; gap: 12px; align-items: flex-start; }
 .award svg { width: 22px; height: 22px; color: var(--amber); flex: none; margin-top: 1px; }
 .lang { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); }
 .bars { display: grid; gap: 12px; }
-.bar-row { display: grid; grid-template-columns: 70px minmax(0,1fr) auto; gap: 12px; align-items: center; font-size: 15px; }
+.bar-row { display: grid; grid-template-columns: 84px minmax(0,1fr) auto; gap: 12px; align-items: center; font-size: 15px; }
 .meter { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
 .meter i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
-.bar-row small { font: 500 12px/1 var(--mono); color: var(--muted); }
+.bar-row small { font: 500 12px/1.3 var(--mono); color: var(--muted); }
+:root[lang="ar"] .bar-row small { font-size: 13px; }
 @media (max-width: 960px) { .creds { grid-template-columns: 1fr 1fr; } .creds .cred:last-child { grid-column: 1 / -1; } }
 @media (max-width: 640px) { .creds { grid-template-columns: 1fr; } }
 
 /* ---------- closing band ---------- */
 .closing { background: var(--night); color: var(--night-ink); margin-top: 110px; padding-block: 84px 36px; position: relative; overflow: hidden; }
 .closing h2 { color: var(--night-ink); font-size: clamp(48px, 9vw, 112px); }
+:root[lang="ar"] .closing h2 { font-size: clamp(36px, 6.5vw, 80px); line-height: 1.4; }
 .closing h2 span { color: transparent; -webkit-text-stroke: 1.5px var(--cyan); }
 .closing p { color: var(--night-muted); max-width: 52ch; margin: 20px 0 0; font-size: 18px; }
 .closing .actions { margin-top: 32px; }
 .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--night-line); margin-top: 72px; padding-top: 22px; font: 500 12px/1.5 var(--mono); color: var(--night-muted); }
+:root[lang="ar"] .foot { font-size: 13px; }
 
 .toast {
   position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px);
@@ -379,9 +438,10 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
-  <symbol id="i-in" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.16-.02-2.64-1.61-2.64-1.61 0-1.86 1.26-1.86 2.56v4.92h-4v-11Z"/></symbol>
-  <symbol id="i-wa" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.98L2 22l5.17-1.5A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.18-1.150l-.3-.18-3.07.9.92-3-.2-.31a8.2 8.2 0 1 1 6.83 3.74Zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.23-.08-.39-.12-.55.12-.16.25-.63.8-.78.96-.14.17-.29.19-.53.06-.25-.12-1.040-.38-1.980-1.22-.73-.65-1.230-1.460-1.370-1.700-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.43-.06-.13-.55-1.330-.76-1.820-.2-.48-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3c-.22.25-.86.84-.86 2.04s.88 2.37 1 2.53c.12.17 1.73 2.64 4.2 3.7.58.25 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.46-.6 1.66-1.17.21-.58.21-1.07.15-1.17-.06-.11-.22-.17-.47-.29Z"/></symbol>
+  <symbol id="i-in" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.160-.02-2.640-1.610-2.640-1.610 0-1.860 1.260-1.860 2.560v4.920h-4v-11Z"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.98L2 22l5.17-1.5A9.9 9.9 0 1 0 12.04 2Zm0 18.1a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.07.9.92-3-.2-.31a8.2 8.2 0 1 1 6.83 3.74Zm4.5-6.14c-.25-.12-1.46-.72-1.69-.8-.23-.08-.39-.12-.55.12-.16.25-.63.8-.78.96-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.43-.06-.13-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3c-.22.25-.86.84-.86 2.04s.88 2.37 1 2.53c.12.17 1.73 2.64 4.2 3.7.58.25 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.46-.6 1.66-1.17.21-.58.21-1.07.15-1.17-.06-.11-.22-.17-.47-.29Z"/></symbol>
   <symbol id="i-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 8 5-3 5 3-1.5-8"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18"/><path d="M12 3a14 14 0 0 0 0 18"/></symbol>
 </svg>
 
 <!-- PHOTO: the page shows photo.jpg if it sits next to this file; otherwise it uses the embedded copy below. -->
@@ -389,9 +449,21 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 
 <div class="bar" id="bar" aria-hidden="true">
   <div class="in">
-    <div class="bar-id"><img class="js-photo" src="photo.jpg" alt=""><div><b>Osama Almamari</b><small>Senior IT Infrastructure &amp; Systems Administrator</small></div></div>
-    <nav class="nav" aria-label="Sections"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
-    <a class="btn btn-primary btn-sm js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener" tabindex="-1"><svg aria-hidden="true"><use href="#i-dl"/></svg>PDF</a>
+    <div class="bar-id"><img class="js-photo" src="photo.jpg" alt=""><div>
+      <b><span class="t-en">Osama Almamari</span><span class="t-ar">أسامة المعمري</span></b>
+      <small><span class="t-en">Senior IT Infrastructure &amp; Systems Administrator</span><span class="t-ar">أخصائي أول في البنية التحتية وإدارة الأنظمة</span></small>
+    </div></div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#about"><span class="t-en">About</span><span class="t-ar">نبذة</span></a>
+      <a href="#experience"><span class="t-en">Experience</span><span class="t-ar">الخبرات</span></a>
+      <a href="#projects"><span class="t-en">Projects</span><span class="t-ar">المشاريع</span></a>
+      <a href="#skills"><span class="t-en">Skills</span><span class="t-ar">المهارات</span></a>
+      <a href="#contact"><span class="t-en">Contact</span><span class="t-ar">تواصل</span></a>
+    </nav>
+    <div class="bar-end">
+      <button class="lang-btn js-lang" type="button" tabindex="-1"><svg aria-hidden="true"><use href="#i-globe"/></svg><span class="t-en" lang="ar">عربي</span><span class="t-ar" lang="en">EN</span></button>
+      <a class="btn btn-primary btn-sm js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener" tabindex="-1"><svg aria-hidden="true"><use href="#i-dl"/></svg>PDF</a>
+    </div>
   </div>
 </div>
 
@@ -399,41 +471,52 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
   <canvas id="topo" aria-hidden="true"></canvas>
   <div class="in">
     <div class="top">
-      <a class="mark" href="#hero" aria-label="Osama Almamari"><span>OA</span><span>21.54°N 39.17°E · JEDDAH</span></a>
-      <nav class="nav" aria-label="Sections"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#skills">Skills</a><a href="#contact">Contact</a></nav>
+      <a class="mark" href="#hero" aria-label="Osama Almamari"><span>OA</span><span>21.54°N 39.17°E · <span class="t-en">JEDDAH</span><span class="t-ar">جدة</span></span></a>
+      <nav class="nav" aria-label="Sections">
+        <a href="#about"><span class="t-en">About</span><span class="t-ar">نبذة</span></a>
+        <a href="#experience"><span class="t-en">Experience</span><span class="t-ar">الخبرات</span></a>
+        <a href="#projects"><span class="t-en">Projects</span><span class="t-ar">المشاريع</span></a>
+        <a href="#skills"><span class="t-en">Skills</span><span class="t-ar">المهارات</span></a>
+        <a href="#contact"><span class="t-en">Contact</span><span class="t-ar">تواصل</span></a>
+      </nav>
+      <button class="lang-btn js-lang" type="button"><svg aria-hidden="true"><use href="#i-globe"/></svg><span class="t-en" lang="ar">العربية</span><span class="t-ar" lang="en">English</span></button>
     </div>
 
     <div class="hero-grid">
       <div>
-        <span class="eyebrow">IT Infrastructure · Systems · Networks</span>
-        <h1 id="name">Osama <span class="ln2">Almamari</span></h1>
-        <p class="role">Senior IT Infrastructure &amp; Systems Administrator</p>
-        <p class="lead"><b>10+ years</b> keeping enterprise servers, networks and Microsoft&nbsp;365 running for multi-branch organizations in Saudi Arabia and Yemen, from virtualization and security to backup, telephony and ERP.</p>
+        <span class="eyebrow"><span class="t-en">IT Infrastructure · Systems · Networks</span><span class="t-ar">البنية التحتية · الأنظمة · الشبكات</span></span>
+        <h1 id="name"><span class="t-en">Osama <span class="ln2">Almamari</span></span><span class="t-ar">أسامة <span class="ln2">المعمري</span></span></h1>
+        <p class="role"><span class="t-en">Senior IT Infrastructure &amp; Systems Administrator</span><span class="t-ar">أخصائي أول في البنية التحتية وإدارة الأنظمة</span></p>
+        <p class="lead t-en"><b>10+ years</b> keeping enterprise servers, networks and Microsoft&nbsp;365 running for multi-branch organizations in Saudi Arabia and Yemen, from virtualization and security to backup, telephony and ERP.</p>
+        <p class="lead t-ar"><b>أكثر من 10 سنوات</b> في تشغيل الخوادم والشبكات ومنصة Microsoft&nbsp;365 لمؤسسات متعددة الفروع في السعودية واليمن، من الأنظمة الافتراضية والأمن إلى النسخ الاحتياطي والاتصالات وأنظمة ERP.</p>
         <div class="actions">
-          <a class="btn btn-primary js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-dl"/></svg>Download CV (PDF)</a>
-          <a class="btn" href="https://www.linkedin.com/in/osama-almamari-it/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-in"/></svg>LinkedIn</a>
-          <a class="btn" href="https://wa.me/966535641550" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg>WhatsApp</a>
+          <a class="btn btn-primary js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-dl"/></svg><span class="t-en">Download CV (PDF)</span><span class="t-ar">تحميل السيرة الذاتية (PDF)</span></a>
+          <a class="btn" href="https://www.linkedin.com/in/osama-almamari-it/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-in"/></svg><span class="t-en">LinkedIn</span><span class="t-ar">لينكدإن</span></a>
+          <a class="btn" href="https://wa.me/966535641550" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg><span class="t-en">WhatsApp</span><span class="t-ar">واتساب</span></a>
         </div>
         <div class="contacts">
-          <div class="contact"><span class="k">Email</span><span class="v">osama.alkadr@gmail.com</span><button class="copy" type="button" data-copy="osama.alkadr@gmail.com" aria-label="Copy email address">Copy</button></div>
-          <div class="contact"><span class="k">Phone</span><span class="v">+966 53 564 1550</span><button class="copy" type="button" data-copy="+966535641550" aria-label="Copy phone number">Copy</button></div>
+          <div class="contact"><span class="k"><span class="t-en">Email</span><span class="t-ar">البريد</span></span><span class="v">osama.alkadr@gmail.com</span><button class="copy" type="button" data-copy="osama.alkadr@gmail.com" aria-label="Copy email address"><span class="c1"><span class="t-en">Copy</span><span class="t-ar">نسخ</span></span><span class="c2"><span class="t-en">Copied</span><span class="t-ar">تم النسخ</span></span></button></div>
+          <div class="contact"><span class="k"><span class="t-en">Phone</span><span class="t-ar">الجوال</span></span><span class="v">+966 53 564 1550</span><button class="copy" type="button" data-copy="+966535641550" aria-label="Copy phone number"><span class="c1"><span class="t-en">Copy</span><span class="t-ar">نسخ</span></span><span class="c2"><span class="t-en">Copied</span><span class="t-ar">تم النسخ</span></span></button></div>
         </div>
       </div>
 
       <div class="portrait">
         <span class="coord">NODE: JED-01 · ONLINE</span>
         <div class="frame">
-          <img class="photo js-photo" src="photo.jpg" alt="Portrait of Osama Almamari" width="640" height="640">
+          <img class="photo js-photo" src="photo.jpg" alt="Osama Almamari" width="640" height="640">
         </div>
-        <div class="tagcard"><span class="led" aria-hidden="true"></span><div><small>Currently</small><b>IT Officer · Alemlaq For Cars</b></div></div>
+        <div class="tagcard"><span class="led" aria-hidden="true"></span><div>
+          <small><span class="t-en">Currently</span><span class="t-ar">حالياً</span></small>
+          <b><span class="t-en">IT Officer · Alemlaq For Cars</span><span class="t-ar">مسؤول تقنية المعلومات · شركة العملاق للسيارات</span></b>
+        </div></div>
       </div>
     </div>
 
     <div class="stats" aria-label="At a glance">
-      <div class="stat"><b>10<sup>+</sup></b><span>years in enterprise IT</span></div>
-      <div class="stat"><b>300<sup>+</sup></b><span>employees supported across HQ and branches</span></div>
-      <div class="stat"><b>3</b><span>companies unified on one network and IP telephony</span></div>
-      <div class="stat"><b>4</b><span>branches trained on Microsoft 365</span></div>
+      <div class="stat"><b>10<sup>+</sup></b><span><span class="t-en">years in enterprise IT</span><span class="t-ar">سنوات خبرة في تقنية المعلومات للمؤسسات</span></span></div>
+      <div class="stat"><b>300<sup>+</sup></b><span><span class="t-en">employees supported across HQ and branches</span><span class="t-ar">موظف تم دعمهم في المقر الرئيسي والفروع</span></span></div>
+      <div class="stat"><b>3</b><span><span class="t-en">companies unified on one network and IP telephony</span><span class="t-ar">شركات وُحّدت على شبكة واتصالات IP واحدة</span></span></div>
+      <div class="stat"><b>4</b><span><span class="t-en">branches trained on Microsoft 365</span><span class="t-ar">فروع تم تدريبها على Microsoft 365</span></span></div>
     </div>
   </div>
 </header>
@@ -441,16 +524,18 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 <main>
   <section id="about" class="in reveal">
     <div class="about">
-      <div class="sec-no">About</div>
+      <div class="sec-no"><span class="t-en">About</span><span class="t-ar">نبذة</span></div>
       <div>
-        <p>Senior IT Infrastructure and Systems Administrator with 10+ years of experience managing enterprise IT environments, <em>Microsoft 365</em> platforms, <em>virtualization</em>, network infrastructure, cybersecurity and <em>ERP</em> systems. I design and maintain highly available IT operations, build business continuity and disaster recovery, lead digital transformation, and deliver advanced technical support, always aligning technology with business objectives to improve efficiency and service reliability.</p>
+        <p class="t-en">Senior IT Infrastructure and Systems Administrator with 10+ years of experience managing enterprise IT environments, <em>Microsoft 365</em> platforms, <em>virtualization</em>, network infrastructure, cybersecurity and <em>ERP</em> systems. I design and maintain highly available IT operations, build business continuity and disaster recovery, lead digital transformation, and deliver advanced technical support, always aligning technology with business objectives to improve efficiency and service reliability.</p>
+        <p class="t-ar">أخصائي أول في البنية التحتية وإدارة الأنظمة بخبرة تزيد على 10 سنوات في إدارة بيئات تقنية المعلومات المؤسسية ومنصات <em>Microsoft 365</em> و<em>الأنظمة الافتراضية</em> والبنية التحتية للشبكات والأمن السيبراني وأنظمة <em>ERP</em>. أصمم وأشغّل عمليات تقنية عالية التوفر، وأبني حلول استمرارية الأعمال والتعافي من الكوارث، وأقود مبادرات التحول الرقمي، وأقدم دعماً فنياً متقدماً، مع مواءمة التقنية دائماً مع أهداف العمل لرفع الكفاءة وموثوقية الخدمة.</p>
       </div>
     </div>
   </section>
 
   <section id="experience" class="in reveal">
-    <div class="sec-head"><div class="sec-no">Experience</div><h2>Career path</h2></div>
-    <div class="rail">
+    <div class="sec-head"><div class="sec-no"><span class="t-en">Experience</span><span class="t-ar">الخبرات</span></div><h2><span class="t-en">Career path</span><span class="t-ar">المسار المهني</span></h2></div>
+
+    <div class="rail t-en">
       <article class="job now">
         <div class="when"><span class="now-lbl">Aug 2024 – Present</span><span class="loc">Jeddah, KSA</span></div>
         <span class="node" aria-hidden="true"></span>
@@ -470,7 +555,6 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
           <div class="chips"><span class="chip">Active Directory</span><span class="chip">Exchange</span><span class="chip">SharePoint</span><span class="chip">Odoo ERP</span><span class="chip">VoIP</span><span class="chip">UniFi</span><span class="chip">DrayTek</span><span class="chip">Hikvision</span><span class="chip">ZKTeco</span></div>
         </div>
       </article>
-
       <article class="job">
         <div class="when">Jun 2018 – Apr 2024<span class="loc">Sana'a, Yemen</span></div>
         <span class="node" aria-hidden="true"></span>
@@ -489,7 +573,6 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
           <div class="chips"><span class="chip">VMware vSphere</span><span class="chip">Citrix XenApp</span><span class="chip">Microsoft 365</span><span class="chip">FortiGate</span><span class="chip">MikroTik</span></div>
         </div>
       </article>
-
       <article class="job">
         <div class="when">Jan 2017 – Apr 2018<span class="loc">Sana'a, Yemen</span></div>
         <span class="node" aria-hidden="true"></span>
@@ -508,7 +591,6 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
           <div class="chips"><span class="chip">Active Directory</span><span class="chip">VMware ESXi</span><span class="chip">Veeam</span></div>
         </div>
       </article>
-
       <article class="job">
         <div class="when">Apr 2014 – Dec 2016<span class="loc">Sana'a, Yemen</span></div>
         <span class="node" aria-hidden="true"></span>
@@ -530,11 +612,90 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
         </div>
       </article>
     </div>
+
+    <div class="rail t-ar">
+      <article class="job now">
+        <div class="when"><span class="now-lbl">أغسطس 2024 – حتى الآن</span><span class="loc">جدة، السعودية</span></div>
+        <span class="node" aria-hidden="true"></span>
+        <div class="job-body">
+          <h3>مسؤول تقنية المعلومات</h3>
+          <p class="org">شركة العملاق للسيارات</p>
+          <ul>
+            <li>إدارة البنية التحتية لتقنية المعلومات والخوادم والشبكات لضمان استمرارية التشغيل وتوفر الأنظمة.</li>
+            <li>إدارة بيئات Active Directory وExchange وSharePoint، بما حسّن إدارة المستخدمين وموثوقية المنصات.</li>
+            <li>تطبيق إجراءات النسخ الاحتياطي والتعافي من الكوارث لتعزيز حماية البيانات وتقليل مخاطر انقطاع الخدمة.</li>
+            <li>دعم تشغيل نظام Odoo ERP وتبنّي المستخدمين له، بما ساهم في أتمتة العمليات ورفع الكفاءة التشغيلية.</li>
+            <li>قيادة إدارة الاتصالات وأنظمة VoIP لضمان اتصالات داخلية وخارجية دون انقطاع.</li>
+            <li>التعاون مع إدارات الشركة لدعم مبادرات التحول الرقمي وتحسين العمليات بالتقنية.</li>
+            <li>إدارة نقاط الوصول UniFi وأجهزة الشبكات DrayTek، بما حسّن توفر الشبكة ودعم سير العمل اليومي.</li>
+            <li>إدارة كاميرات المراقبة Hikvision وأنظمة التحكم بالدخول ZKTeco لدعم الأمن المادي وإدارة المرافق.</li>
+          </ul>
+          <div class="chips"><span class="chip">Active Directory</span><span class="chip">Exchange</span><span class="chip">SharePoint</span><span class="chip">Odoo ERP</span><span class="chip">VoIP</span><span class="chip">UniFi</span><span class="chip">DrayTek</span><span class="chip">Hikvision</span><span class="chip">ZKTeco</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when">يونيو 2018 – أبريل 2024<span class="loc">صنعاء، اليمن</span></div>
+        <span class="node" aria-hidden="true"></span>
+        <div class="job-body">
+          <h3>مسؤول تقنية معلومات أول ومدير أنظمة</h3>
+          <p class="org">مؤسسة تمدين شباب</p>
+          <ul>
+            <li>إدارة البنية التحتية لتقنية المعلومات لأكثر من 300 موظف في المقر الرئيسي وعدة فروع.</li>
+            <li>إدارة بيئات VMware ESXi vSphere وCitrix XenApp لتحسين تقديم التطبيقات وأداء البنية التحتية.</li>
+            <li>إدارة منظومة Microsoft 365 بما فيها Exchange Online وSharePoint وTeams وOneDrive.</li>
+            <li>تطبيق حلول الأمن السيبراني والجدران النارية والنسخ الاحتياطي والتعافي من الكوارث لتعزيز مرونة المؤسسة.</li>
+            <li>قيادة مشاريع تقنية المعلومات والتنسيق مع الموردين وعمليات شراء التقنية لدعم نمو المؤسسة.</li>
+            <li>الإشراف على إدارة الموقع الإلكتروني وأنظمة المراقبة وأجهزة المستخدمين من طابعات وماسحات ضوئية لضمان كفاءة العمل اليومي.</li>
+            <li>إدارة جدران الحماية FortiGate وشبكات MikroTik لتعزيز أمن الشبكة وتحسين الاتصال وموثوقية التشغيل.</li>
+          </ul>
+          <div class="chips"><span class="chip">VMware vSphere</span><span class="chip">Citrix XenApp</span><span class="chip">Microsoft 365</span><span class="chip">FortiGate</span><span class="chip">MikroTik</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when">يناير 2017 – أبريل 2018<span class="loc">صنعاء، اليمن</span></div>
+        <span class="node" aria-hidden="true"></span>
+        <div class="job-body">
+          <h3>مدير أنظمة</h3>
+          <p class="org">مستشفى الأمومة الآمنة التخصصي</p>
+          <ul>
+            <li>إدارة بيئات Active Directory وVMware vSphere ESXi وVeeam Backup &amp; Replication لضمان تشغيل تقني آمن وموثوق.</li>
+            <li>الإشراف على تركيب وإعداد الأجهزة والبرمجيات والأنظمة والشبكات والطابعات والماسحات وكاميرات المراقبة.</li>
+            <li>تشخيص مشكلات الأنظمة والشبكات وحل أعطال الأجهزة والبرمجيات.</li>
+            <li>صيانة وتحسين الأنظمة والبنية التحتية للشبكة لدعم استمرارية العمل وإنتاجية المستخدمين.</li>
+            <li>إنشاء حسابات وملفات المستخدمين الجدد ومعالجة مشكلات كلمات المرور.</li>
+            <li>ترتيب أولويات عدد كبير من البلاغات المفتوحة وإدارتها في وقت واحد.</li>
+            <li>تقديم الدعم وإعداد الأدلة الإجرائية والتقارير التي تمكّن المستخدمين من استخدام الأنظمة بفعالية.</li>
+          </ul>
+          <div class="chips"><span class="chip">Active Directory</span><span class="chip">VMware ESXi</span><span class="chip">Veeam</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when">أبريل 2014 – ديسمبر 2016<span class="loc">صنعاء، اليمن</span></div>
+        <span class="node" aria-hidden="true"></span>
+        <div class="job-body">
+          <h3>مسؤول تقنية المعلومات</h3>
+          <p class="org">جمعية رعاية الأسرة اليمنية</p>
+          <ul>
+            <li>إدارة بيئات Active Directory وVMware vSphere ESXi وVeeam Backup &amp; Replication وCitrix XenApp/XenDesktop لتقديم خدمات تقنية آمنة وموثوقة.</li>
+            <li>الإشراف على فريق تقنية المعلومات ومشاريعه، وتحديد أنظمة وخدمات التقنية وتنفيذها.</li>
+            <li>تحسين أداء البنية التحتية عبر المراقبة الاستباقية والصيانة والتحسين المستمر.</li>
+            <li>تنسيق أنشطة الحاسب الآلي في المؤسسة وتخطيطها وقيادتها، وتلبية احتياجاتها من أنظمة المعلومات.</li>
+            <li>بناء وإدارة بيئة خوادم افتراضية وحل للنسخ الاحتياطي.</li>
+            <li>تصميم وتركيب وصيانة أنظمة مراقبة بكاميرات IP لتعزيز أمن المرافق ومراقبتها.</li>
+            <li>ضمان اتصال إنترنت رئيسي موثوق مع خطوط احتياطية، وضبط الشبكة لثبات عالٍ ومراقبة السرعة ومعدل المعلومات الملتزم به (CIR).</li>
+            <li>صيانة وإعداد جميع أجهزة وبرمجيات تقنية المعلومات: الطابعات وآلات التصوير والماسحات والحواسيب المحمولة والمكتبية والخوادم والهواتف الذكية والأجهزة اللوحية وWindows 10 وMS Office وOutlook.</li>
+            <li>إدارة الموقع الإلكتروني للمؤسسة وحساباتها على شبكات التواصل الاجتماعي.</li>
+          </ul>
+          <div class="chips"><span class="chip">VMware ESXi</span><span class="chip">Veeam</span><span class="chip">Citrix XenDesktop</span><span class="chip">IP CCTV</span></div>
+        </div>
+      </article>
+    </div>
   </section>
 
   <section id="projects" class="in reveal">
-    <div class="sec-head"><div class="sec-no">Key projects</div><h2>Projects I led</h2></div>
-    <div class="projects">
+    <div class="sec-head"><div class="sec-no"><span class="t-en">Key projects</span><span class="t-ar">أبرز المشاريع</span></div><h2><span class="t-en">Projects I led</span><span class="t-ar">مشاريع قُدتها</span></h2></div>
+
+    <div class="projects t-en">
       <article class="proj feature">
         <div>
           <div class="yr">2025</div>
@@ -571,24 +732,62 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
         </ul>
       </article>
     </div>
+
+    <div class="projects t-ar">
+      <article class="proj feature">
+        <div>
+          <div class="yr">2025</div>
+          <h3>البنية التحتية والاتصالات والتحول الرقمي للمؤسسة</h3>
+          <p class="org">شركة العملاق للسيارات</p>
+          <div class="sites"><span class="site">العملاق</span><span class="site">البرق</span><span class="site">الرعد</span><span class="site">الدمام ⇄ الرياض</span></div>
+        </div>
+        <ul>
+          <li>قيادة توحيد وتحديث البنية التحتية للشبكات والاتصالات في شركات العملاق والبرق والرعد، بما حسّن جودة الاتصال واستقرار التشغيل وقلّل تعقيد الإدارة.</li>
+          <li>تخطيط وتنفيذ الانتقال من أنظمة الهاتف الرقمية القديمة إلى بنية اتصالات IP موحدة في الشركات الثلاث، وتأسيس اتصال سلس بينها.</li>
+          <li>تصميم وتنفيذ حلول استمرارية الأعمال عبر ربط آمن بين فرعي الدمام والرياض لضمان تشغيل دون انقطاع وتوفر عالٍ للخدمات.</li>
+          <li>قيادة تطوير نظام Odoo ERP وتطبيقه وتخصيصه وتدريب المستخدمين عليه كحل مؤسسي متكامل لأتمتة العمليات في مختلف الإدارات.</li>
+        </ul>
+      </article>
+      <article class="proj">
+        <div class="yr">2022</div>
+        <h3>نشر البنية التحتية لتقنية المعلومات والتحول الرقمي</h3>
+        <p class="org">مؤسسة تمدين شباب</p>
+        <ul>
+          <li>تركيب وإعداد بنية شبكية كاملة لمبنى جديد.</li>
+          <li>تطبيق نظام ERP مفتوح المصدر لتخطيط موارد المؤسسة ومركزية البيانات.</li>
+          <li>التنسيق مع مورد خارجي لتطوير موقع إلكتروني جديد للمؤسسة وإدارة تحديث محتواه.</li>
+          <li>نشر Citrix XenApp لتمكين الموظفين من الوصول الآمن عن بُعد إلى أنظمة المؤسسة وتطبيقاتها.</li>
+          <li>قيادة نقل خدمات البريد إلى Microsoft 365 (Exchange وSharePoint وOneDrive وTeams) وتدريب المستخدمين في أربعة فروع.</li>
+        </ul>
+      </article>
+      <article class="proj">
+        <div class="yr">2016</div>
+        <h3>تصميم البنية التحتية للشبكات والأنظمة الافتراضية</h3>
+        <p class="org">جمعية رعاية الأسرة اليمنية</p>
+        <ul>
+          <li>نقل الخوادم الفعلية إلى منصة VMware ESXi vSphere، بما حسّن قابلية التوسع واستغلال الموارد وعزّز التعافي من الكوارث مع خفض التكاليف.</li>
+          <li>تطوير معمارية شبكية متكاملة وحلول ربط، شملت أنظمة كاميرات مراقبة IP في جميع المرافق.</li>
+        </ul>
+      </article>
+    </div>
   </section>
 
   <section id="skills" class="in reveal">
-    <div class="sec-head"><div class="sec-no">Skills</div><h2>The stack I run</h2></div>
-    <div class="rack" role="list" aria-label="Technologies by area">
-      <div class="rack-top"><span>RACK-A · 6U · Technologies &amp; tools</span><span class="leds" aria-hidden="true"><i></i><i></i><i></i></span></div>
-      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U1 · Virtualization<small>apps &amp; compute</small></h4><div class="ports"><span class="port hl">VMware vSphere ESXi</span><span class="port">Citrix XenApp</span><span class="port">Citrix XenServer</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
-      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U2 · Microsoft &amp; OS<small>identity &amp; productivity</small></h4><div class="ports"><span class="port hl">Microsoft 365</span><span class="port">Exchange Online</span><span class="port">SharePoint Online</span><span class="port">Teams</span><span class="port">OneDrive</span><span class="port hl">Active Directory</span><span class="port">SCCM</span><span class="port">Windows Server</span><span class="port">Linux Administration</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
-      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U3 · Networking<small>LAN · WAN · voice</small></h4><div class="ports"><span class="port hl">Cisco</span><span class="port">MikroTik</span><span class="port">UniFi</span><span class="port">DrayTek</span><span class="port">IP Telephony / VoIP</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
-      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U4 · Security<small>perimeter &amp; access</small></h4><div class="ports"><span class="port hl">FortiGate Firewall</span><span class="port">Sophos Firewall</span><span class="port">Hikvision CCTV</span><span class="port">ZKTeco Access Control</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
-      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U5 · Continuity<small>backup &amp; DR</small></h4><div class="ports"><span class="port hl">Veeam Backup &amp; Replication</span><span class="port">Disaster Recovery</span><span class="port">Business Continuity</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
-      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U6 · ERP<small>business systems</small></h4><div class="ports"><span class="port hl">Odoo ERP</span><span class="port">ERPNext</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
+    <div class="sec-head"><div class="sec-no"><span class="t-en">Skills</span><span class="t-ar">المهارات</span></div><h2><span class="t-en">The stack I run</span><span class="t-ar">التقنيات التي أديرها</span></h2></div>
+    <div class="rack" role="list" aria-label="Technologies">
+      <div class="rack-top"><span>RACK-A · 6U · <span class="t-en">Technologies &amp; tools</span><span class="t-ar">التقنيات والأدوات</span></span><span class="leds" aria-hidden="true"><i></i><i></i><i></i></span></div>
+      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U1 · <span class="t-en">Virtualization</span><span class="t-ar">الأنظمة الافتراضية</span><small><span class="t-en">apps &amp; compute</span><span class="t-ar">التطبيقات والحوسبة</span></small></h4><div class="ports"><span class="port hl">VMware vSphere ESXi</span><span class="port">Citrix XenApp</span><span class="port">Citrix XenServer</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
+      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U2 · <span class="t-en">Microsoft &amp; OS</span><span class="t-ar">مايكروسوفت والأنظمة</span><small><span class="t-en">identity &amp; productivity</span><span class="t-ar">الهوية والإنتاجية</span></small></h4><div class="ports"><span class="port hl">Microsoft 365</span><span class="port">Exchange Online</span><span class="port">SharePoint Online</span><span class="port">Teams</span><span class="port">OneDrive</span><span class="port hl">Active Directory</span><span class="port">SCCM</span><span class="port">Windows Server</span><span class="port"><span class="t-en">Linux Administration</span><span class="t-ar">إدارة Linux</span></span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
+      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U3 · <span class="t-en">Networking</span><span class="t-ar">الشبكات</span><small><span class="t-en">LAN · WAN · voice</span><span class="t-ar">LAN · WAN · الاتصالات</span></small></h4><div class="ports"><span class="port hl">Cisco</span><span class="port">MikroTik</span><span class="port">UniFi</span><span class="port">DrayTek</span><span class="port">IP Telephony / VoIP</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
+      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U4 · <span class="t-en">Security</span><span class="t-ar">الأمن</span><small><span class="t-en">perimeter &amp; access</span><span class="t-ar">الحماية والتحكم بالدخول</span></small></h4><div class="ports"><span class="port hl">FortiGate Firewall</span><span class="port">Sophos Firewall</span><span class="port">Hikvision CCTV</span><span class="port">ZKTeco Access Control</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
+      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U5 · <span class="t-en">Continuity</span><span class="t-ar">الاستمرارية</span><small><span class="t-en">backup &amp; DR</span><span class="t-ar">النسخ الاحتياطي والتعافي</span></small></h4><div class="ports"><span class="port hl">Veeam Backup &amp; Replication</span><span class="port"><span class="t-en">Disaster Recovery</span><span class="t-ar">التعافي من الكوارث</span></span><span class="port"><span class="t-en">Business Continuity</span><span class="t-ar">استمرارية الأعمال</span></span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
+      <div class="unit" role="listitem"><div class="ear" aria-hidden="true"><i></i><i></i></div><h4>U6 · ERP<small><span class="t-en">business systems</span><span class="t-ar">أنظمة الأعمال</span></small></h4><div class="ports"><span class="port hl">Odoo ERP</span><span class="port">ERPNext</span></div><div class="ear" aria-hidden="true"><i></i><i></i></div></div>
     </div>
 
     <div class="comp">
       <div>
-        <h3>Core competencies</h3>
-        <ul>
+        <h3><span class="t-en">Core competencies</span><span class="t-ar">الكفاءات الأساسية</span></h3>
+        <ul class="t-en">
           <li>IT Infrastructure Management</li>
           <li>Systems Administration</li>
           <li>Microsoft 365 Administration</li>
@@ -602,43 +801,68 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
           <li>Vendor Management</li>
           <li>Digital Transformation Initiatives</li>
         </ul>
+        <ul class="t-ar">
+          <li>إدارة البنية التحتية لتقنية المعلومات</li>
+          <li>إدارة الأنظمة</li>
+          <li>إدارة Microsoft 365</li>
+          <li>إدارة Active Directory</li>
+          <li>إدارة الشبكات (LAN/WAN)</li>
+          <li>الأمن السيبراني والتحكم بالوصول</li>
+          <li>النسخ الاحتياطي والتعافي من الكوارث واستمرارية الأعمال</li>
+          <li>إدارة أنظمة ERP (Odoo وERPNext)</li>
+          <li>الدعم الفني (L2/L3)</li>
+          <li>إدارة مشاريع تقنية المعلومات</li>
+          <li>إدارة الموردين</li>
+          <li>مبادرات التحول الرقمي</li>
+        </ul>
       </div>
       <div>
-        <h3>Personal skills</h3>
-        <div class="soft"><span>Leadership</span><span>Problem Solving</span><span>Analytical Thinking</span><span>Decision Making</span><span>Work Under Pressure</span><span>Prioritization</span><span>Time Management</span><span>Organization &amp; Planning</span><span>Effective Communication</span><span>Teamwork</span><span>Attention to Detail</span><span>Flexibility</span><span>Professional Relationship Building</span><span>Self-Motivation</span><span>Continuous Development</span></div>
+        <h3><span class="t-en">Personal skills</span><span class="t-ar">المهارات الشخصية</span></h3>
+        <div class="soft t-en"><span>Leadership</span><span>Problem Solving</span><span>Analytical Thinking</span><span>Decision Making</span><span>Work Under Pressure</span><span>Prioritization</span><span>Time Management</span><span>Organization &amp; Planning</span><span>Effective Communication</span><span>Teamwork</span><span>Attention to Detail</span><span>Flexibility</span><span>Professional Relationship Building</span><span>Self-Motivation</span><span>Continuous Development</span></div>
+        <div class="soft t-ar"><span>القيادة</span><span>حل المشكلات</span><span>التفكير التحليلي</span><span>اتخاذ القرار</span><span>العمل تحت الضغط</span><span>ترتيب الأولويات</span><span>إدارة الوقت</span><span>التنظيم والتخطيط</span><span>التواصل الفعّال</span><span>العمل الجماعي</span><span>الاهتمام بالتفاصيل</span><span>المرونة</span><span>بناء العلاقات المهنية</span><span>التحفيز الذاتي</span><span>التطوير المستمر</span></div>
       </div>
     </div>
   </section>
 
   <section id="credentials" class="in reveal">
-    <div class="sec-head"><div class="sec-no">Credentials</div><h2>Education &amp; training</h2></div>
+    <div class="sec-head"><div class="sec-no"><span class="t-en">Credentials</span><span class="t-ar">المؤهلات</span></div><h2><span class="t-en">Education &amp; training</span><span class="t-ar">التعليم والتدريب</span></h2></div>
     <div class="creds">
       <div class="cred">
-        <h3>Education</h3>
-        <dl><div><dt>Bachelor's in Computer Sciences and Engineering</dt><dd>Al Hodeidah University · Yemen · 2013</dd></div></dl>
+        <h3><span class="t-en">Education</span><span class="t-ar">التعليم</span></h3>
+        <dl>
+          <div class="t-en"><dt>Bachelor's in Computer Sciences and Engineering</dt><dd>Al Hodeidah University · Yemen · 2013</dd></div>
+          <div class="t-ar"><dt>بكالوريوس علوم وهندسة الحاسوب</dt><dd>جامعة الحديدة · اليمن · 2013</dd></div>
+        </dl>
         <div class="lang">
-          <h3>Languages</h3>
+          <h3><span class="t-en">Languages</span><span class="t-ar">اللغات</span></h3>
           <div class="bars">
-            <div class="bar-row"><span>Arabic</span><span class="meter"><i style="width:100%"></i></span><small>Native</small></div>
-            <div class="bar-row"><span>English</span><span class="meter"><i style="width:60%"></i></span><small>Intermediate</small></div>
+            <div class="bar-row"><span><span class="t-en">Arabic</span><span class="t-ar">العربية</span></span><span class="meter"><i style="width:100%"></i></span><small><span class="t-en">Native</span><span class="t-ar">اللغة الأم</span></small></div>
+            <div class="bar-row"><span><span class="t-en">English</span><span class="t-ar">الإنجليزية</span></span><span class="meter"><i style="width:60%"></i></span><small><span class="t-en">Intermediate</span><span class="t-ar">متوسط</span></small></div>
           </div>
         </div>
       </div>
       <div class="cred">
-        <h3>Training courses</h3>
-        <dl>
+        <h3><span class="t-en">Training courses</span><span class="t-ar">الدورات التدريبية</span></h3>
+        <dl class="t-en">
           <div><dt>MCSA</dt><dd>Self learning · 2023</dd></div>
           <div><dt>ERPNext</dt><dd>Frappe School · 2022</dd></div>
           <div><dt>VMware ESXi</dt><dd>2018</dd></div>
           <div><dt>ISO 9001:2015 Awareness &amp; Implementation</dt></div>
           <div><dt>ISO 9001:2015 Documentation Training</dt></div>
         </dl>
+        <dl class="t-ar">
+          <div><dt>MCSA</dt><dd>تعلّم ذاتي · 2023</dd></div>
+          <div><dt>ERPNext</dt><dd>Frappe School · 2022</dd></div>
+          <div><dt>VMware ESXi</dt><dd>2018</dd></div>
+          <div><dt>ISO 9001:2015 التوعية والتطبيق</dt></div>
+          <div><dt>ISO 9001:2015 التوثيق</dt></div>
+        </dl>
       </div>
       <div class="cred">
-        <h3>Awards &amp; recognition</h3>
+        <h3><span class="t-en">Awards &amp; recognition</span><span class="t-ar">الجوائز والتقدير</span></h3>
         <dl>
-          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt>Employee of the Year</dt><dd>Tamdeen Youth Foundation · 2023</dd></div></div>
-          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt>Training Certificate, Microsoft 365</dt><dd>Tamdeen Youth Foundation · 2023</dd></div></div>
+          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt><span class="t-en">Employee of the Year</span><span class="t-ar">موظف العام</span></dt><dd><span class="t-en">Tamdeen Youth Foundation</span><span class="t-ar">مؤسسة تمدين شباب</span> · 2023</dd></div></div>
+          <div class="award"><svg aria-hidden="true"><use href="#i-award"/></svg><div><dt><span class="t-en">Training Certificate, Microsoft 365</span><span class="t-ar">شهادة تدريب Microsoft 365</span></dt><dd><span class="t-en">Tamdeen Youth Foundation</span><span class="t-ar">مؤسسة تمدين شباب</span> · 2023</dd></div></div>
         </dl>
       </div>
     </div>
@@ -647,19 +871,22 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 
 <footer class="closing" id="contact">
   <div class="in">
-    <span class="eyebrow">Contact</span>
-    <h2 style="margin-top:18px">Let's keep your<br><span>systems running.</span></h2>
-    <p>Reach me by phone, WhatsApp or email, or take the full CV with you as a PDF.</p>
+    <span class="eyebrow"><span class="t-en">Contact</span><span class="t-ar">تواصل</span></span>
+    <h2 style="margin-top:18px"><span class="t-en">Let's keep your<br><span>systems running.</span></span><span class="t-ar">لنحافظ على<br><span>أنظمتك تعمل.</span></span></h2>
+    <p><span class="t-en">Reach me by phone, WhatsApp or email, or take the full CV with you as a PDF.</span><span class="t-ar">تواصل معي عبر الجوال أو واتساب أو البريد، أو حمّل السيرة الذاتية كاملة بصيغة PDF.</span></p>
     <div class="actions">
-      <a class="btn btn-primary js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-dl"/></svg>Download CV (PDF)</a>
-      <a class="btn" href="https://wa.me/966535641550" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg>WhatsApp</a>
-      <a class="btn" href="https://www.linkedin.com/in/osama-almamari-it/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-in"/></svg>LinkedIn</a>
+      <a class="btn btn-primary js-dl" href="Osama_Almamari_CV.pdf" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-dl"/></svg><span class="t-en">Download CV (PDF)</span><span class="t-ar">تحميل السيرة الذاتية (PDF)</span></a>
+      <a class="btn" href="https://wa.me/966535641550" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-wa"/></svg><span class="t-en">WhatsApp</span><span class="t-ar">واتساب</span></a>
+      <a class="btn" href="https://www.linkedin.com/in/osama-almamari-it/" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-in"/></svg><span class="t-en">LinkedIn</span><span class="t-ar">لينكدإن</span></a>
     </div>
     <div class="contacts">
-      <div class="contact"><span class="k">Email</span><span class="v">osama.alkadr@gmail.com</span><button class="copy" type="button" data-copy="osama.alkadr@gmail.com" aria-label="Copy email address">Copy</button></div>
-      <div class="contact"><span class="k">Phone</span><span class="v">+966 53 564 1550</span><button class="copy" type="button" data-copy="+966535641550" aria-label="Copy phone number">Copy</button></div>
+      <div class="contact"><span class="k"><span class="t-en">Email</span><span class="t-ar">البريد</span></span><span class="v">osama.alkadr@gmail.com</span><button class="copy" type="button" data-copy="osama.alkadr@gmail.com" aria-label="Copy email address"><span class="c1"><span class="t-en">Copy</span><span class="t-ar">نسخ</span></span><span class="c2"><span class="t-en">Copied</span><span class="t-ar">تم النسخ</span></span></button></div>
+      <div class="contact"><span class="k"><span class="t-en">Phone</span><span class="t-ar">الجوال</span></span><span class="v">+966 53 564 1550</span><button class="copy" type="button" data-copy="+966535641550" aria-label="Copy phone number"><span class="c1"><span class="t-en">Copy</span><span class="t-ar">نسخ</span></span><span class="c2"><span class="t-en">Copied</span><span class="t-ar">تم النسخ</span></span></button></div>
     </div>
-    <div class="foot"><span>Osama Almamari · Jeddah, Saudi Arabia</span><span>Senior IT Infrastructure &amp; Systems Administrator</span></div>
+    <div class="foot">
+      <span><span class="t-en">Osama Almamari · Jeddah, Saudi Arabia</span><span class="t-ar">أسامة المعمري · جدة، السعودية</span></span>
+      <span><span class="t-en">Senior IT Infrastructure &amp; Systems Administrator</span><span class="t-ar">أخصائي أول في البنية التحتية وإدارة الأنظمة</span></span>
+    </div>
   </div>
 </footer>
 
@@ -667,7 +894,15 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 
 <script>
 (function () {
-  var PDF = "Osama_Almamari_CV.pdf";
+  var PDFS = { en: "Osama_Almamari_CV.pdf", ar: "Osama_Almamari_CV_AR.pdf" };
+  var TITLES = { en: "Osama Almamari | Senior IT Infrastructure & Systems Administrator", ar: "أسامة المعمري | أخصائي أول في البنية التحتية وإدارة الأنظمة" };
+  var MSG = {
+    en: { saved: "CV downloaded", busy: "A download prompt is already open", sel: "Selected. Copy it from your device" },
+    ar: { saved: "تم تحميل السيرة الذاتية", busy: "نافذة التحميل مفتوحة بالفعل", sel: "تم التحديد، انسخه من جهازك" }
+  };
+  var root = document.documentElement, lang = "en";
+  var standalone = !window.claude;
+  function pdf() { return PDFS[lang]; }
 
   /* Photo: use photo.jpg when present, otherwise the embedded copy */
   document.querySelectorAll(".js-photo").forEach(function (img) {
@@ -677,15 +912,58 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
   });
 
   var toastEl = document.getElementById("toast"), toastT;
-  function toast(msg) {
-    toastEl.textContent = msg; toastEl.classList.add("show");
+  function toast(key) {
+    toastEl.textContent = MSG[lang][key]; toastEl.classList.add("show");
     clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove("show"); }, 2400);
   }
 
-  /* Download: viewer's save prompt when available; otherwise the link opens the PDF */
+  /* Keep the full name on one line: shrink only if it would overflow its column */
+  var nameEl = document.getElementById("name");
+  function fitName() {
+    nameEl.style.fontSize = "";
+    var box = nameEl.parentNode.clientWidth, w = nameEl.scrollWidth, fs = parseFloat(getComputedStyle(nameEl).fontSize);
+    if (w > box) nameEl.style.fontSize = Math.floor(fs * box / w * 0.98) + "px";
+  }
+
+  /* Language */
+  var redrawTopo = function () {};
+  function setLang(l, save) {
+    lang = l === "ar" ? "ar" : "en";
+    root.lang = lang;
+    root.dir = lang === "ar" ? "rtl" : "ltr";
+    document.title = TITLES[lang];
+    document.querySelectorAll(".js-dl").forEach(function (a) {
+      a.href = pdf();
+      if (standalone) { a.setAttribute("download", pdf()); a.removeAttribute("target"); }
+    });
+    document.querySelectorAll(".js-lang").forEach(function (b) {
+      b.setAttribute("aria-label", lang === "ar" ? "Switch to English" : "التبديل إلى العربية");
+    });
+    if (save) {
+      try { localStorage.setItem("cv-lang", lang); } catch (e) {}
+      try {
+        var u = new URL(location.href);
+        if (lang === "ar") u.searchParams.set("lang", "ar"); else u.searchParams.delete("lang");
+        history.replaceState(null, "", u.toString());
+      } catch (e) {}
+    }
+    fitName(); redrawTopo();
+  }
+  var initial = "en";
+  try {
+    var q = new URLSearchParams(location.search).get("lang");
+    if (q === "ar" || q === "en") initial = q;
+    else { var s = localStorage.getItem("cv-lang"); if (s === "ar" || s === "en") initial = s; }
+  } catch (e) {}
+  setLang(initial, false);
+  document.querySelectorAll(".js-lang").forEach(function (b) {
+    b.addEventListener("click", function () { setLang(lang === "ar" ? "en" : "ar", true); });
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
+  window.addEventListener("resize", fitName);
+
+  /* Download: viewer's save prompt when available; otherwise the link downloads/opens the PDF */
   var downloads = null;
-  /* Outside Claude (your own hosting): make the buttons download the file directly */
-  if (!window.claude) document.querySelectorAll(".js-dl").forEach(function (a) { a.setAttribute("download", PDF); a.removeAttribute("target"); });
   try {
     if (window.claude && typeof window.claude.use === "function") {
       window.claude.use("downloads").then(function (d) { downloads = d; }).catch(function () {});
@@ -695,15 +973,16 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
     a.addEventListener("click", function (ev) {
       if (!downloads) return;
       ev.preventDefault();
+      var file = pdf();
       a.setAttribute("aria-busy", "true");
-      fetch(PDF).then(function (r) { if (!r.ok) throw new Error("fetch"); return r.blob(); })
-        .then(function (blob) { return downloads.save({ filename: PDF, data: blob }); })
-        .then(function (res) { if (res && res.status === "saved") toast("CV downloaded"); })
+      fetch(file).then(function (r) { if (!r.ok) throw new Error("fetch"); return r.blob(); })
+        .then(function (blob) { return downloads.save({ filename: file, data: blob }); })
+        .then(function (res) { if (res && res.status === "saved") toast("saved"); })
         .catch(function (err) {
           var code = err && err.code;
           if (code === "declined") return;
-          if (code === "rate_limited") { toast("A download prompt is already open"); return; }
-          window.open(PDF, "_blank", "noopener") || (location.href = PDF);
+          if (code === "rate_limited") { toast("busy"); return; }
+          window.open(file, "_blank", "noopener") || (location.href = file);
         })
         .finally(function () { a.removeAttribute("aria-busy"); });
     });
@@ -713,12 +992,12 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
   document.querySelectorAll(".copy").forEach(function (b) {
     b.addEventListener("click", function () {
       var text = b.getAttribute("data-copy");
-      var done = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1600); };
+      var done = function () { b.classList.add("done"); setTimeout(function () { b.classList.remove("done"); }, 1600); };
       var fallback = function () {
         var v = b.parentNode.querySelector(".v");
         var r = document.createRange(); r.selectNodeContents(v);
         var s = getSelection(); s.removeAllRanges(); s.addRange(r);
-        toast("Selected. Copy it from your device");
+        toast("sel");
       };
       try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
     });
@@ -731,20 +1010,9 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
       var off = !es[0].isIntersecting;
       bar.classList.toggle("show", off);
       bar.setAttribute("aria-hidden", off ? "false" : "true");
-      bar.querySelector(".js-dl").tabIndex = off ? 0 : -1;
+      bar.querySelectorAll(".js-dl, .js-lang").forEach(function (el) { el.tabIndex = off ? 0 : -1; });
     }, { rootMargin: "-120px 0px 0px 0px" }).observe(hero);
   }
-
-  /* Keep the full name on one line: shrink only if it would overflow its column */
-  var nameEl = document.getElementById("name");
-  function fitName() {
-    nameEl.style.fontSize = "";
-    var box = nameEl.parentNode.clientWidth, w = nameEl.scrollWidth, fs = parseFloat(getComputedStyle(nameEl).fontSize);
-    if (w > box) nameEl.style.fontSize = Math.floor(fs * box / w * 0.98) + "px";
-  }
-  fitName();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitName);
-  window.addEventListener("resize", fitName);
 
   /* Highlight the nav pill for the section on screen */
   var navLinks = document.querySelectorAll(".nav a");
@@ -800,7 +1068,12 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
     });
     for (var k = 0; k < Math.min(26, links.length); k++) packets.push({ l: Math.floor(rnd() * links.length), t: rnd(), s: .0025 + rnd() * .004 });
   }
-  function weight(x) { /* fade on the text side */ var f = x / W; return W < 860 ? .3 : Math.max(.12, Math.min(1, (f - .25) * 1.6)); }
+  /* fade on the text side (left in English, right in Arabic) */
+  function weight(x) {
+    if (W < 860) return .3;
+    var f = x / W; if (lang === "ar") f = 1 - f;
+    return Math.max(.12, Math.min(1, (f - .25) * 1.6));
+  }
   function draw() {
     ctx.clearRect(0, 0, W, H);
     ctx.lineWidth = 1;
@@ -831,6 +1104,7 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
     draw(); requestAnimationFrame(step);
   }
   build(); draw();
+  redrawTopo = function () { build(); draw(); };
   if (!reduce) {
     requestAnimationFrame(step);
     if ("IntersectionObserver" in window) new IntersectionObserver(function (es) {
