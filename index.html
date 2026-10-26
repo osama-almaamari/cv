@@ -658,23 +658,48 @@ h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
     });
   });
 
-  /* Highlight the nav pill for the section on screen */
+  /* Highlight the nav pill for the section being read.
+     Two-column layout (desktop): follow the main column only, since Skills/Education sit beside it.
+     One column (phones): follow every section in order. A clicked pill stays active until scrolling settles. */
   var navLinks = document.querySelectorAll(".nav a");
-  if ("IntersectionObserver" in window) {
-    var spy = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        navLinks.forEach(function (a) {
-          var on = a.getAttribute("href") === "#" + e.target.id;
-          a.classList.toggle("is-active", on);
-          if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
-        });
-      });
-    }, { rootMargin: "-40% 0px -55% 0px" });
-    ["summary", "experience", "projects", "skills", "education"].forEach(function (id) {
-      var el = document.getElementById(id); if (el) spy.observe(el);
+  var twoCol = window.matchMedia("(min-width: 901px)");
+  var lockUntil = 0, ticking = false;
+  function setActive(id) {
+    navLinks.forEach(function (a) {
+      var on = a.getAttribute("href") === "#" + id;
+      a.classList.toggle("is-active", on);
+      if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
     });
   }
+  function currentSection() {
+    var ids = twoCol.matches ? ["summary", "experience", "projects"] : ["summary", "experience", "projects", "skills", "education"];
+    var line = 150, pick = ids[0];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= line) pick = id;
+    });
+    return pick;
+  }
+  function onScroll() {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      if (Date.now() < lockUntil) return;
+      setActive(currentSection());
+    });
+  }
+  navLinks.forEach(function (a) {
+    a.addEventListener("click", function () {
+      setActive(a.getAttribute("href").slice(1));
+      lockUntil = Date.now() + 1200;
+    });
+  });
+  window.addEventListener("scroll", function () {
+    if (Date.now() < lockUntil) lockUntil = Date.now() + 250; /* keep the clicked pill until the smooth scroll stops */
+    onScroll();
+  }, { passive: true });
+  window.addEventListener("resize", onScroll);
+  setActive(currentSection());
 })();
 </script>
 
