@@ -1,3 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a1622">
+<link rel="icon" href="photo.jpg">
+<style>html,body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Osama Almamari</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Osama Almamari, Senior IT Infrastructure & Systems Administrator in Jeddah with 10+ years across virtualization, Microsoft 365, networking, security and ERP.">
@@ -198,9 +207,10 @@ h1 .ln2 { display: block; color: transparent; -webkit-text-stroke: 1.5px var(--n
 
 @media (max-width: 860px) {
   .hero-grid { grid-template-columns: 1fr; gap: 36px; padding-top: 18px; }
-  .portrait { justify-self: start; width: min(78%, 300px); order: -1; }
-  .tagcard { left: auto; right: -18px; bottom: -18px; }
-  .portrait { margin-bottom: 18px; }
+  .portrait { justify-self: start; width: min(62%, 220px); order: -1; }
+  .tagcard { position: static; margin-top: 4px; width: max-content; max-width: 100%; }
+  .portrait { width: auto; }
+  .frame { width: min(62vw, 220px); }
   .coord { display: none; }
 }
 @media (max-width: 640px) {
@@ -348,6 +358,8 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
 @media (prefers-reduced-motion: reduce) { .reveal, .reveal.pre { transition: none; opacity: 1; transform: none; } }
 </style>
 
+</head>
+<body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol>
   <symbol id="i-in" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.16-.02-2.64-1.61-2.64-1.61 0-1.86 1.26-1.86 2.56v4.92h-4v-11Z"/></symbol>
@@ -782,3 +794,6 @@ h2 { font-family: var(--display); font-stretch: 72%; font-weight: 800; text-tran
   var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { build(); draw(); }, 150); });
 })();
 </script>
+
+</body>
+</html>
